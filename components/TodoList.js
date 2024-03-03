@@ -44,7 +44,7 @@ export function TodoList() {
             setShowUrgentChecked(!showUrgentChecked);
           }}
         />
-        <label for="show-urgent-check">Show urgent todos only</label>
+        <label for="show-urgent-check">Show urgent only</label>
 
         <input
           className="sort-urgency-check m-1"
@@ -55,7 +55,7 @@ export function TodoList() {
             setSortUrgencyDescending(!sortUrgencyDescending);
           }}
         />
-        <label for="sort-urgency-check">Sort urgent tasks first</label>
+        <label for="sort-urgency-check">Sort urgent first</label>
       </div>
       <div className="bg-slate-50 m-3 p-2 rounded-xl shadow-md">
         <h1 className="text-xl  m-3">Task List</h1>
