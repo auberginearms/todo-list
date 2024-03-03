@@ -25,7 +25,7 @@ export function TodoList() {
       <div className="m-2 flex flex-col">
         <input
           type="text"
-          className="w-1/2 p-2 mx-2 b-1 border-gray-400 border-2 rounded-xl"
+          className="w-3/5 p-2 mx-2 b-1 border-gray-400 border-2 rounded-xl"
           placeholder="🔍Search for tasks"
           value={searchInput}
           onChange={(e) => {
@@ -34,28 +34,31 @@ export function TodoList() {
           }}
         />
       </div>
-      <div className="flex-col m-2">
-        <input
-          className="show-urgent-check m-1"
-          type="checkbox"
-          value={showUrgentChecked}
-          checked={showUrgentChecked}
-          onChange={() => {
-            setShowUrgentChecked(!showUrgentChecked);
-          }}
-        />
-        <label for="show-urgent-check">Show urgent only</label>
-
-        <input
-          className="sort-urgency-check m-1"
-          type="checkbox"
-          value={sortUrgencyDescending}
-          checked={sortUrgencyDescending}
-          onChange={(e) => {
-            setSortUrgencyDescending(!sortUrgencyDescending);
-          }}
-        />
-        <label for="sort-urgency-check">Sort urgent first</label>
+      <div className="flex flex-row m-2 px-3 w-3/5">
+        <div className="mr-7">
+          <input
+            className="show-urgent-check m-1"
+            type="checkbox"
+            value={showUrgentChecked}
+            checked={showUrgentChecked}
+            onChange={() => {
+              setShowUrgentChecked(!showUrgentChecked);
+            }}
+          />
+          <label for="show-urgent-check">Show urgent only</label>
+        </div>
+        <div className="mr-7">
+          <input
+            className="sort-urgency-check m-1"
+            type="checkbox"
+            value={sortUrgencyDescending}
+            checked={sortUrgencyDescending}
+            onChange={(e) => {
+              setSortUrgencyDescending(!sortUrgencyDescending);
+            }}
+          />
+          <label for="sort-urgency-check">Sort urgent first</label>
+        </div>
       </div>
       <div className="bg-slate-50 m-3 p-2 rounded-xl shadow-md">
         <h1 className="text-xl  m-3">Task List</h1>
