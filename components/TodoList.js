@@ -1,14 +1,27 @@
+import { AddTodo } from "./AddTodo";
 import { Todo } from "./Todo";
 import { useState } from "react";
 
+const initialTodoList = [
+  { todo: "walk dog", urgency: true, completed: true },
+  { todo: "buy groceries", urgency: false, completed: false },
+  { todo: "take out bins", urgency: true, completed: true },
+  { todo: "pat a cat", urgency: true, completed: false },
+  { todo: "vacuum", urgency: false, completed: false },
+];
+
 export function TodoList() {
-  const [todoList, setTodoList] = useState([
-    { todo: "walk dog", urgency: true, completed: true },
-    { todo: "buy groceries", urgency: false, completed: false },
-    { todo: "take out bins", urgency: true, completed: true },
-    { todo: "pat a cat", urgency: true, completed: false },
-    { todo: "vacuum", urgency: false, completed: false },
-  ]);
+  const [todoList, setTodoList] = useState(
+    initialTodoList.map((todo, index) => {
+      return { ...todo, id: index };
+    })
+  );
+  function setTodoListWithIncrementingIds(todos) {
+    const newTodoListWithIds = todos.map((todo, index) => {
+      return { ...todo, id: index };
+    });
+    setTodoList(newTodoListWithIds);
+  }
   const [todoInput, setTodoInput] = useState("");
   const [urgentChecked, setUrgentChecked] = useState(false);
   const [showUrgentChecked, setShowUrgentChecked] = useState(false);
@@ -45,7 +58,7 @@ export function TodoList() {
               setShowUrgentChecked(!showUrgentChecked);
             }}
           />
-          <label for="show-urgent-check">Show urgent only</label>
+          <label htmlFor="show-urgent-check">Show urgent only</label>
         </div>
         <div className="mr-7">
           <input
@@ -53,11 +66,11 @@ export function TodoList() {
             type="checkbox"
             value={sortUrgencyDescending}
             checked={sortUrgencyDescending}
-            onChange={(e) => {
+            onChange={() => {
               setSortUrgencyDescending(!sortUrgencyDescending);
             }}
           />
-          <label for="sort-urgency-check">Sort urgent first</label>
+          <label htmlFor="sort-urgency-check">Sort urgent first</label>
         </div>
       </div>
       <div className="bg-slate-50 m-3 p-2 rounded-xl shadow-md">
@@ -72,7 +85,7 @@ export function TodoList() {
               setTodoInput(e.target.value);
             }}
           />
-          <label for="urgent-check" className="m-1">
+          <label htmlFor="urgent-check" className="m-1">
             Urgent?
           </label>
           <input
@@ -80,32 +93,32 @@ export function TodoList() {
             type="checkbox"
             value={urgentChecked}
             checked={urgentChecked}
-            onChange={(e) => {
+            onChange={() => {
               setUrgentChecked(!urgentChecked);
             }}
           />
-          <button
-            className="bg-blue-500 text-white p-2 rounded-md cursor-pointer m-2 hover:bg-blue-800"
-            onClick={() => {
-              const newTodoList = [...todoList];
-              newTodoList.push({
-                todo: todoInput,
-                urgency: urgentChecked,
-                completed: false,
-              });
-              setTodoList(newTodoList);
+          <AddTodo
+            todoList={todoList}
+            todoInput={todoInput}
+            urgentChecked={urgentChecked}
+            onClick={(newTodoList) => {
+              setTodoListWithIncrementingIds(newTodoList);
               setUrgentChecked(false);
               setTodoInput("");
             }}
-          >
-            Add New Todo
-          </button>
+          />
         </div>
         <div className="m-2">
           <button
             className="bg-blue-500 text-white p-2 rounded-md cursor-pointer m-2 hover:bg-blue-800"
             onClick={() => {
-              setTodoList([]);
+              setTodoListWithIncrementingIds(
+                todoList.filter((todo) => {
+                  return !todosToDisplay.some((todoToDisplay) => {
+                    return todoToDisplay.id === todo.id;
+                  });
+                })
+              );
             }}
           >
             Clear all todos
@@ -113,40 +126,65 @@ export function TodoList() {
           <button
             className="bg-blue-500 text-white p-2 rounded-md cursor-pointer m-2 hover:bg-blue-800"
             onClick={() => {
-              const newTodoList = [...todoList];
-              newTodoList.splice(0, 1);
-              setTodoList(newTodoList);
+              if (todosToDisplay.length === 0) {
+                console.log("no more items");
+                return;
+              }
+              setTodoListWithIncrementingIds(
+                todoList.filter((todo) => {
+                  return todosToDisplay[0].id !== todo.id;
+                })
+              );
             }}
           >
             Remove first todo
           </button>
         </div>
-        <ul>{todosToDisplay}</ul>
+        <ul>
+          {todosToDisplay.map((todo) => {
+            return (
+              <Todo
+                item={todo}
+                key={todo.id}
+                checked={todo.completed}
+                onChange={(newCheckedStatus) => {
+                  const newTodoList = [...todoList];
+                  newTodoList.splice(todo.id, 1, {
+                    ...todo,
+                    completed: newCheckedStatus,
+                  });
+                  setTodoListWithIncrementingIds(newTodoList);
+                }}
+              />
+            );
+          })}
+        </ul>
       </div>
     </div>
   );
-}
 
-function getTodosToDisplay(todoList, showUrgentChecked, sort, searchInput) {
-  const todoListFilteredByUrgency = showUrgentChecked
-    ? todoList.filter((todo) => {
-        return todo.urgency;
-      })
-    : todoList;
+  function getTodosToDisplay(todoList, showUrgentChecked, sort, searchInput) {
+    const todoListFilteredByUrgency = showUrgentChecked
+      ? todoList.filter((todo) => {
+          return todo.urgency;
+        })
+      : todoList;
 
-  const todosFilteredBySearchInput = todoListFilteredByUrgency.filter(
-    (todo) => {
-      return todo.todo.toLowerCase().includes(searchInput);
-    }
-  );
+    const todosFilteredBySearchInput = todoListFilteredByUrgency.filter(
+      (todo) => {
+        if (todo.todo === undefined) {
+          return;
+        }
+        return todo.todo.toLowerCase().includes(searchInput);
+      }
+    );
 
-  const todoListByDescendingUrgency = sort
-    ? todosFilteredBySearchInput.toSorted((a, b) => {
-        return b.urgency - a.urgency;
-      })
-    : todosFilteredBySearchInput;
+    const todoListByDescendingUrgency = sort
+      ? todosFilteredBySearchInput.toSorted((a, b) => {
+          return b.urgency - a.urgency;
+        })
+      : todosFilteredBySearchInput;
 
-  return todoListByDescendingUrgency.map((todo) => {
-    return <Todo item={todo} />;
-  });
+    return todoListByDescendingUrgency;
+  }
 }

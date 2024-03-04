@@ -1,4 +1,4 @@
-export function Todo({ item }) {
+export function Todo({ item, onChange }) {
   return (
     <li>
       <div
@@ -8,6 +8,9 @@ export function Todo({ item }) {
           type="checkbox"
           checked={item.completed}
           className="mx-2"
+          onChange={(e) => {
+            onChange(e.target.checked);
+          }}
         ></input>
         {item.todo} {item.urgency ? "(urgent)" : ""}
       </div>
